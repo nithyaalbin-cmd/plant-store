@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { getProduct } from "@/data/getProduct";
+import { createOrder } from "@/data/createOrder";
 
 export default function CheckoutPage() {
   const searchParams = useSearchParams();
@@ -10,6 +11,12 @@ export default function CheckoutPage() {
   const quantity = Number(searchParams.get("quantity")) || 1;
 
   const [product, setProduct] = useState<any>(null);
+
+  const [customerName, setCustomerName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState("");
+
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     async function loadProduct() {
@@ -30,6 +37,40 @@ export default function CheckoutPage() {
 
   const total = quantity * product.price;
 
+  async function handlePlaceOrder() {
+    if (
+      customerName.trim() === "" ||
+      phone.trim() === "" ||
+      address.trim() === ""
+    ) {
+      alert("Please fill in all fields.");
+      return;
+    }
+
+    setLoading(true);
+
+    const result = await createOrder({
+      customer_name: customerName,
+      phone,
+      address,
+      product_name: product.name,
+      quantity,
+      total,
+    });
+
+    setLoading(false);
+
+    if (result.success) {
+      alert("🎉 Order placed successfully!");
+
+      setCustomerName("");
+      setPhone("");
+      setAddress("");
+    } else {
+      alert("Something went wrong while placing your order.");
+    }
+  }
+
   return (
     <main className="min-h-screen bg-green-50 py-12 px-6">
       <div className="max-w-3xl mx-auto bg-white rounded-3xl shadow-xl p-10">
@@ -42,7 +83,7 @@ export default function CheckoutPage() {
           Complete your order
         </p>
 
-        <form className="space-y-6">
+        <div className="space-y-6">
 
           <div>
             <label className="block font-semibold mb-2">
@@ -52,6 +93,8 @@ export default function CheckoutPage() {
             <input
               type="text"
               placeholder="Enter your name"
+              value={customerName}
+              onChange={(e) => setCustomerName(e.target.value)}
               className="w-full border rounded-xl px-4 py-3"
             />
           </div>
@@ -62,8 +105,10 @@ export default function CheckoutPage() {
             </label>
 
             <input
-              type="tel"
+              type="text"
               placeholder="Enter phone number"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
               className="w-full border rounded-xl px-4 py-3"
             />
           </div>
@@ -74,13 +119,15 @@ export default function CheckoutPage() {
             </label>
 
             <textarea
-              placeholder="Enter your full address"
               rows={4}
+              placeholder="Enter your address"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
               className="w-full border rounded-xl px-4 py-3"
             />
           </div>
 
-        </form>
+        </div>
 
         <div className="mt-10 bg-green-100 rounded-2xl p-6">
 
@@ -112,8 +159,12 @@ export default function CheckoutPage() {
 
         </div>
 
-        <button className="mt-10 w-full bg-green-700 hover:bg-green-800 text-white py-4 rounded-xl text-lg font-semibold transition">
-          Place Order
+        <button
+          onClick={handlePlaceOrder}
+          disabled={loading}
+          className="mt-10 w-full bg-green-700 hover:bg-green-800 disabled:bg-gray-400 text-white py-4 rounded-xl text-lg font-semibold transition"
+        >
+          {loading ? "Placing Order..." : "Place Order"}
         </button>
 
       </div>
