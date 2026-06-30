@@ -1,30 +1,10 @@
-"use client";
+import { Product } from "@/types";
 
-import { useEffect, useState } from "react";
-import { getProduct } from "@/data/getProduct";
+interface HeroProps {
+  product: Product;
+}
 
-export default function Hero() {
-  const [product, setProduct] = useState<any>(null);
-
-  useEffect(() => {
-    async function loadProduct() {
-      const data = await getProduct();
-      setProduct(data);
-    }
-
-    loadProduct();
-  }, []);
-
-  if (!product) {
-    return (
-      <section className="bg-gradient-to-br from-green-50 via-green-100 to-green-50 py-32">
-        <div className="text-center text-2xl font-semibold text-green-700">
-          Loading...
-        </div>
-      </section>
-    );
-  }
-
+export default function Hero({ product }: HeroProps) {
   return (
     <section className="bg-gradient-to-br from-green-50 via-green-100 to-green-50">
       <div className="max-w-7xl mx-auto px-6 py-16 lg:py-24">
@@ -82,7 +62,7 @@ export default function Hero() {
               </div>
 
               <p className="mt-6 text-gray-500 text-lg text-center">
-                Beautiful Mango Plant Image
+                Product Image
                 <br />
                 (We'll replace this later)
               </p>

@@ -1,44 +1,25 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import { getProduct } from "@/data/getProduct";
+import { Product } from "@/types";
 
-export default function ProductCard() {
-  const [product, setProduct] = useState<any>(null);
+interface ProductCardProps {
+  product: Product;
+}
+
+export default function ProductCard({ product }: ProductCardProps) {
   const [quantity, setQuantity] = useState(1);
 
-  useEffect(() => {
-    async function loadProduct() {
-      const data = await getProduct();
-      setProduct(data);
-    }
-
-    loadProduct();
-  }, []);
-
-  if (!product) {
-    return (
-      <section
-        id="product"
-        className="bg-white py-20 flex justify-center"
-      >
-        <h2 className="text-2xl font-semibold text-green-700">
-          Loading Product...
-        </h2>
-      </section>
-    );
+  function increase() {
+    setQuantity((prev) => prev + 1);
   }
 
-  const increase = () => {
-    setQuantity((prev) => prev + 1);
-  };
-
-  const decrease = () => {
+  function decrease() {
     if (quantity > 1) {
       setQuantity((prev) => prev - 1);
     }
-  };
+  }
 
   const total = quantity * product.price;
 
@@ -139,11 +120,9 @@ export default function ProductCard() {
             </div>
 
             <Link href={`/checkout?quantity=${quantity}`}>
-
               <button className="mt-10 w-full bg-green-700 hover:bg-green-800 text-white py-4 rounded-xl text-lg font-semibold transition">
                 Buy Now
               </button>
-
             </Link>
 
           </div>

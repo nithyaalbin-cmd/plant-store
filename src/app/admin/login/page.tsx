@@ -2,21 +2,27 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { signIn } from "@/data/signIn";
 
 export default function AdminLoginPage() {
   const router = useRouter();
 
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  function handleLogin() {
-    if (
-      username === "admin" &&
-      password === "amma123"
-    ) {
+  const [loading, setLoading] = useState(false);
+
+  async function handleLogin() {
+    setLoading(true);
+
+    const success = await signIn(email, password);
+
+    setLoading(false);
+
+    if (success) {
       router.push("/admin/dashboard");
     } else {
-      alert("Invalid username or password.");
+      alert("Invalid email or password.");
     }
   }
 
@@ -37,14 +43,14 @@ export default function AdminLoginPage() {
 
           <div>
             <label className="block font-semibold mb-2">
-              Username
+              Email
             </label>
 
             <input
-              type="text"
-              placeholder="Enter username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              type="email"
+              placeholder="Enter email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full border rounded-xl px-4 py-3"
             />
           </div>
@@ -67,9 +73,10 @@ export default function AdminLoginPage() {
 
         <button
           onClick={handleLogin}
-          className="mt-10 w-full bg-green-700 hover:bg-green-800 text-white py-4 rounded-xl text-lg font-semibold transition"
+          disabled={loading}
+          className="mt-10 w-full bg-green-700 hover:bg-green-800 disabled:bg-gray-400 text-white py-4 rounded-xl text-lg font-semibold transition"
         >
-          Login
+          {loading ? "Signing In..." : "Login"}
         </button>
 
       </div>
